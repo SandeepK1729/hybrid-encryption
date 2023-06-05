@@ -1,0 +1,156 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Form Example</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f0f0f0;
+                padding: 20px;
+              }
+              
+              h1 {
+                color: #333;
+                text-align: center;
+              }
+              
+              label {
+                font-weight: bold;
+              }
+              
+              select,
+              textarea,
+              input {
+                margin-bottom: 10px;
+                width: 100%;
+                padding: 5px;
+              }
+              
+              button {
+                background-color: #4caf50;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                cursor: pointer;
+              }
+              
+              button:hover {
+                background-color: #45a049;
+              }
+              
+              .container {
+                max-width: 500px;
+                margin: 0 auto;
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 5px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+              }
+        </style>            
+      </head>
+<body>
+
+    <form method="post" id="action_form">
+        <h1>Hybrid Encryption</h1>
+        <label for="operation">Select operation:</label>
+        <select id="operation">
+            <option value="encrypt">Encrypt</option>
+            <option value="decrypt">Decrypt</option>
+        </select>
+        <br><br>
+        <label for="text">Enter text:</label>
+        <textarea id="text" rows="5" cols="50" maxlength="200"></textarea>
+        <br><br>
+        <label for="algorithm1">Select algorithm 1:</label>
+        <select id="algorithm1">
+            <option value="caesar">Caesar Cipher</option>
+            <option value="playfair">Playfair</option>
+            <option value="aes">AES</option>
+            <option value="otp">One Time Pad</option>
+            <option value="railfence">Rail Fence</option>
+        </select>
+        <br><br>
+        <label for="key1">Enter key 1:</label>
+        <input type="text" id="key1">
+        <br><br>
+        <label for="algorithm2">Select algorithm 2:</label>
+        <select id="algorithm2">
+            <option value="caesar">Caesar Cipher</option>
+            <option value="playfair">Playfair</option>
+            <option value="aes">AES</option>
+            <option value="otp">One Time Pad</option>
+            <option value="railfence">Rail Fence</option>
+        </select>
+        <br><br>
+        <label for="key2">Enter key 2:</label>
+        <input type="text" id="key2">
+        <br><br>
+        <label for="algorithm3">Select algorithm 3:</label>
+        <select id="algorithm3">
+            <option value="caesar">Caesar Cipher</option>
+            <option value="playfair">Playfair</option>
+            <option value="aes">AES</option>
+            <option value="otp">One Time Pad</option>
+            <option value="railfence">Rail Fence</option>
+        </select>
+        <br><br>
+        <label for="key3">Enter key 3:</label>
+        <input type="text" id="key3">
+        <br><br>
+        <p id="result"></p>
+        <button id="generate" type="submit">Generate</button>
+    </form>
+
+    <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+    <script>
+        var result = $("#result");
+
+        console.log($("#operation").val());
+        $("#action_form").on("submit", (form) => {
+            form.preventDefault();
+            
+            var operation = $("#operation");
+            var text = $("#text");
+            var algorithm1 = $("#algorithm1");
+            var key1 = $("#key1");
+            var algorithm2 = $("#algorithm2");
+            var key2 = $("#key2");
+            var algorithm3 = $("#algorithm3");
+            var key3 = $("#key3");
+            var csrfmiddlewaretoken = '{{ csrf_token }}';
+
+            
+            $.ajax({
+                url : '/',
+                type : 'POST',
+                data : {
+                    operation : operation.val(),
+                    text : text.val(),
+                    algorithm1 : algorithm1.val(),
+                    key1 : key1.val(),
+                    algorithm2 : algorithm2.val(),
+                    key2 : key2.val(),
+                    algorithm3 : algorithm3.val(),
+                    key3 : key3.val(),
+                    csrfmiddlewaretoken : csrfmiddlewaretoken
+                },
+                success : (response) => {
+                    result.html(text.val() + " -- " + operation.val() + " --> " + response.result);
+   
+                    text.val("");
+                    key1.val("");
+                    key2.val("");
+                    key3.val("");
+
+                },
+                failure : (response) => {
+                    alert("Failed to send request, because of some error");
+                }
+            })
+        });
+
+
+    </script>
+</body>
+</html>
