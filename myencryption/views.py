@@ -1,50 +1,72 @@
-from django.shortcuts import render
+import random
+import string
+
+from cryptography.fernet import Fernet
+from django.forms import JSONField
 from django.http import JsonResponse
-from .encryption import (
-    caesar_encrypt, caesar_decrypt,
-    playfair_encrypt, playfair_decrypt,
-    aes_encrypt, aes_decrypt,
-    otp_encrypt, otp_decrypt,
-    railfence_encrypt, railfence_decrypt,
-)
+from django.shortcuts import render, HttpResponse
+
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .encryption import *
 
 def index(request):
-    if request.method == 'POST':
-        text = request.POST.get('text')
-        operation = request.POST.get('operation')
-        algorithm1 = request.POST.get('algorithm1')
-        key1 = request.POST.get('key1')
-        algorithm2 = request.POST.get('algorithm2')
-        key2 = request.POST.get('key2')
-        algorithm3 = request.POST.get('algorithm3')
-        key3 = request.POST.get('key3')
-
-        if algorithm1 == 'caesar':
-            if operation == 'encrypt':
-                text = caesar_encrypt(text, int(key1))
-            elif operation == 'decrypt':
-                text = caesar_decrypt(text, int(key1))
-        elif algorithm1 == 'playfair':
-            if operation == 'encrypt':
-                text = playfair_encrypt(text, key1)
-            elif operation == 'decrypt':
-                text = playfair_decrypt(text, key1)
-        elif algorithm1 == 'aes':
-            if operation == 'encrypt':
-                text = aes_encrypt(text, key1)
-            elif operation == 'decrypt':
-                text = aes_decrypt(text, key1)
-        elif algorithm1 == 'otp':
-            if operation == 'encrypt':
-                text = otp_encrypt(text, key1)
-            elif operation == 'decrypt':
-                text = otp_decrypt(text, key1)
-        elif algorithm1 == 'railfence':
-            if operation == 'encrypt':
-                text = railfence_encrypt(text, int(key1))
-            elif operation == 'decrypt':
-                text = railfence_decrypt(text, int(key1))
-
-        return JsonResponse({'result': text})
-
     return render(request, 'encryption.html')
+
+@csrf_exempt
+def generate(request):
+	if request.method == "POST":
+		# Get the data from the request
+		data = request.body.decode("utf-8")
+		data = json.loads(data) 
+
+		# Get the selected action
+		action = data["action"]
+
+		# Get the input text
+		text = data["text"]
+
+		# get number of algo's
+		n = data.get('n', 4)
+
+		
+		algorithms = []
+		for i in range(1, n + 1):
+			algorithms.append({
+				'name' : data.get(f"algorithm{i}"),
+				'key'  : data.get(f"key{i}")
+			})
+
+		actions = {
+			'encrypt' : {
+				'caesar' : caesar_encrypt,
+				'playfair': playfair_encrypt,
+				'otp': otp_encrypt,
+				'aes': aes_encrypt,
+				'railfence': railfence_encrypt
+			},
+			'decrypt' : {
+				'caesar' : caesar_decrypt,
+				'playfair' : playfair_decrypt,
+				'otp': otp_decrypt,
+				'aes': aes_decrypt,
+				'railfence': railfence_decrypt
+			}
+		}
+
+		# Encrypt or decrypt the text based on the selected action
+		output = text
+		algo_type = actions[action]
+
+		for algorithm in algorithms:
+			func = algo_type[algorithm['name']]
+			output = func(output, algorithm['key'])
+		
+		result = {
+			'output': output,
+			'algo': algorithms
+		}
+		# Return the output as a JSON response
+		return HttpResponse(output)
+
+	return HttpResponse("NONE")

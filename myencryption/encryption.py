@@ -1,4 +1,6 @@
 def caesar_encrypt(text, key):
+    key = int(key)
+
     encrypted_text = ""
     for char in text:
         if char.isalpha():
@@ -11,6 +13,8 @@ def caesar_encrypt(text, key):
     return encrypted_text
 
 def caesar_decrypt(text, key):
+    key = int(key)
+
     decrypted_text = ""
     for char in text:
         if char.isalpha():
@@ -172,6 +176,7 @@ def otp_decrypt(text, key):
     return decrypted_text
 
 def railfence_encrypt(text, key):
+    key = int(key)
     # Remove whitespaces from the text
     text = text.replace(" ", "")
     # Create the rail fence pattern
@@ -193,6 +198,7 @@ def railfence_encrypt(text, key):
     return encrypted_text
 
 def railfence_decrypt(text, key):
+    key = int(key)
     # Remove whitespaces from the text
     text = text.replace(" ", "")
     # Calculate the length of each rail
