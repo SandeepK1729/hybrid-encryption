@@ -11,7 +11,7 @@ import json
 from .encryption import *
 
 def index(request):
-    return render(request, 'encryption.html')
+    return render(request, 'home.html')
 
 @csrf_exempt
 def generate(request):
@@ -27,7 +27,7 @@ def generate(request):
 		text = data["text"]
 
 		# get number of algo's
-		n = data.get('n', 4)
+		n = int(data.get('n', '1'))
 
 		
 		algorithms = []
@@ -37,35 +37,16 @@ def generate(request):
 				'key'  : data.get(f"key{i}")
 			})
 
-		actions = {
-			'encrypt' : {
-				'caesar' : caesar_encrypt,
-				'playfair': playfair_encrypt,
-				'otp': otp_encrypt,
-				'aes': aes_encrypt,
-				'railfence': railfence_encrypt
-			},
-			'decrypt' : {
-				'caesar' : caesar_decrypt,
-				'playfair' : playfair_decrypt,
-				'otp': otp_decrypt,
-				'aes': aes_decrypt,
-				'railfence': railfence_decrypt
-			}
-		}
+		
 
 		# Encrypt or decrypt the text based on the selected action
 		output = text
-		algo_type = actions[action]
+		algo_type = get_action(action)
 
 		for algorithm in algorithms:
 			func = algo_type[algorithm['name']]
 			output = func(output, algorithm['key'])
 		
-		result = {
-			'output': output,
-			'algo': algorithms
-		}
 		# Return the output as a JSON response
 		return HttpResponse(output)
 

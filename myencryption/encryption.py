@@ -237,3 +237,26 @@ def railfence_decrypt(text, key):
         if row == 0 or row == key - 1:
             direction *= -1
     return decrypted_text
+
+actions = {
+    'encrypt' : {
+        'caesar' : caesar_encrypt,
+        'playfair': playfair_encrypt,
+        'otp': otp_encrypt,
+        'aes': aes_encrypt,
+        'railfence': railfence_encrypt
+    },
+    'decrypt' : {
+        'caesar' : caesar_decrypt,
+        'playfair' : playfair_decrypt,
+        'otp': otp_decrypt,
+        'aes': aes_decrypt,
+        'railfence': railfence_decrypt
+    }
+}
+
+def get_action(action_name):
+    if action_name in actions:
+        return actions[action_name]
+    else:
+        raise ValueError("Invalid action name.")
